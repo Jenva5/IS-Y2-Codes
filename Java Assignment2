@@ -1,0 +1,281 @@
+// QUESTION1
+import java.util.Scanner;
+
+public class Loan {
+
+    private double monthlyPayment;
+    private int yearsForPayment;
+    private double totalAmount;
+
+  
+    public Loan() {
+      
+        this.totalAmount = 0;
+    }
+
+   
+    public void setMonthlyPayment(double monthlyPayment) {
+        this.monthlyPayment = monthlyPayment;
+        this.totalAmount = calculateTotalAmount(); 
+    }
+
+    
+    public void setYearsForPayment(int yearsForPayment) {
+        this.yearsForPayment = yearsForPayment;
+        this.totalAmount = calculateTotalAmount();
+    }
+
+   
+    public double calculateTotalAmount() {
+       
+        return this.monthlyPayment * this.yearsForPayment * 12;
+    }
+
+    
+    public double getTotalAmount() {
+        return this.totalAmount;
+    }
+
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        Loan loan = new Loan();
+
+       
+        System.out.print("Enter the monthly payment: ");
+        double monthlyPayment = scan.nextDouble();
+        loan.setMonthlyPayment(monthlyPayment); 
+
+        System.out.print("Enter the years for payment: ");
+        int yearsForPayment = scan.nextInt();
+        loan.setYearsForPayment(yearsForPayment); 
+
+
+        System.out.println("\nLoan Details:");
+        System.out.println("Monthly Payment: " + monthlyPayment +"FRW");
+        System.out.println("Years for Payment: " + yearsForPayment);
+        System.out.println("Total Amount to be Paid: " + loan.getTotalAmount() +"FRW");
+
+        
+    }
+}
+
+//QUESTION2
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class StudentInfo {
+
+    // Database connection details
+    private static final String URL = "jdbc:mysql://localhost:3306/Students"; // Empty URL for creating a new database
+    private static final String USER = "root"; // Database username
+    private static final String PASSWORD = ""; // Database password
+
+    // Method to establish a connection to the database
+    public static Connection connect() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+
+    // Method to create database and table
+    public static void createDatabaseAndTable() {
+        try (Connection conn = connect(); 
+             Statement stmt = conn.createStatement()) {
+
+            // Create Database
+            String createDatabaseSQL = "CREATE DATABASE IF NOT EXISTS Students";
+            stmt.executeUpdate(createDatabaseSQL);
+
+            // Use the created database
+            String useDatabaseSQL = "USE Student2";
+            stmt.executeUpdate(useDatabaseSQL);
+
+            // Create Table
+            String createTableSQL = "CREATE TABLE IF NOT EXISTS STUDENT (" +
+                    "reg_number INT PRIMARY KEY, " +
+                    "last_name VARCHAR(100), " +
+                    "first_name VARCHAR(100), " +
+                    "years_of_study INT, " +
+                    "telephone VARCHAR(15), " +
+                    "college VARCHAR(100), " +
+                    "email VARCHAR(100))";
+                  
+            stmt.executeUpdate(createTableSQL);
+
+            System.out.println("Database and table created successfully.");
+        } catch (SQLException e) {
+            System.out.println("Error creating database or table: " + e.getMessage());
+        }
+    }
+
+    // Method to insert student data into the database
+    public void insertStudent(int regNumber, String lastName, String firstName, int yearsOfStudy,
+                              String telephone, String college, String email) {
+        String sql = "INSERT INTO STUDENT(reg_number, last_name, first_name, years_of_study, telephone, college, email, physics, mathematics, chemistry, biology) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, regNumber);
+            pstmt.setString(2, lastName);
+            pstmt.setString(3, firstName);
+            pstmt.setInt(4, yearsOfStudy);
+            pstmt.setString(5, telephone);
+            pstmt.setString(6, college);
+            pstmt.setString(7, email);
+            pstmt.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Data inserted correctly.");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error for data inserted: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        // Create the database and table
+        createDatabaseAndTable();
+
+        JFrame frame = new JFrame("Student Information");
+        frame.setSize(500, 500);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        placeComponents(panel);
+
+        frame.setVisible(true);
+    }
+
+    private static void placeComponents(JPanel panel) {
+        panel.setLayout(null);
+        panel.setBackground(Color.GRAY); // Light black background
+
+        // Labels and text fields
+        Font labelFont = new Font("Arial", Font.BOLD, 14);
+        Font textFont = new Font("Arial", Font.PLAIN, 12);
+
+        JLabel regLabel = new JLabel("Reg Number:");
+        regLabel.setBounds(10, 20, 100, 25);
+        regLabel.setForeground(Color.WHITE);
+        regLabel.setFont(labelFont);
+        panel.add(regLabel);
+
+        JTextField regText = new JTextField(20);
+        regText.setBounds(120, 20, 165, 25);
+        regText.setFont(textFont);
+        regText.setBackground(new Color(240, 240, 240)); // Light background for text fields
+        panel.add(regText);
+
+        JLabel lastNameLabel = new JLabel("Last Name:");
+        lastNameLabel.setBounds(10, 50, 100, 25);
+        lastNameLabel.setForeground(Color.WHITE);
+        lastNameLabel.setFont(labelFont);
+        panel.add(lastNameLabel);
+
+        JTextField lastNameText = new JTextField(20);
+        lastNameText.setBounds(120, 50, 165, 25);
+        lastNameText.setFont(textFont);
+        lastNameText.setBackground(new Color(240, 240, 240));
+        panel.add(lastNameText);
+
+        JLabel firstNameLabel = new JLabel("First Name:");
+        firstNameLabel.setBounds(10, 80, 100, 25);
+        firstNameLabel.setForeground(Color.WHITE);
+        firstNameLabel.setFont(labelFont);
+        panel.add(firstNameLabel);
+
+        JTextField firstNameText = new JTextField(20);
+        firstNameText.setBounds(120, 80, 165, 25);
+        firstNameText.setFont(textFont);
+        firstNameText.setBackground(new Color(240, 240, 240));
+        panel.add(firstNameText);
+
+        JLabel yearsLabel = new JLabel("Years of Study:");
+        yearsLabel.setBounds(10, 110, 100, 25);
+        yearsLabel.setForeground(Color.WHITE);
+        yearsLabel.setFont(labelFont);
+        panel.add(yearsLabel);
+
+        JTextField yearsText = new JTextField(20);
+        yearsText.setBounds(120, 110, 165, 25);
+        yearsText.setFont(textFont);
+        yearsText.setBackground(new Color(240, 240, 240));
+        panel.add(yearsText);
+
+        JLabel phoneLabel = new JLabel("Telephone:");
+        phoneLabel.setBounds(10, 140, 100, 25);
+        phoneLabel.setForeground(Color.WHITE);
+        phoneLabel.setFont(labelFont);
+        panel.add(phoneLabel);
+
+        JTextField phoneText = new JTextField(20);
+        phoneText.setBounds(120, 140, 165, 25);
+        phoneText.setFont(textFont);
+        phoneText.setBackground(new Color(240, 240, 240));
+        panel.add(phoneText);
+
+        JLabel collegeLabel = new JLabel("College:");
+        collegeLabel.setBounds(10, 170, 100, 25);
+        collegeLabel.setForeground(Color.WHITE);
+        collegeLabel.setFont(labelFont);
+        panel.add(collegeLabel);
+
+        JTextField collegeText = new JTextField(20);
+        collegeText.setBounds(120, 170, 165, 25);
+        collegeText.setFont(textFont);
+        collegeText.setBackground(new Color(240, 240, 240));
+        panel.add(collegeText);
+
+        JLabel emailLabel = new JLabel("Email:");
+        emailLabel.setBounds(10, 200, 100, 25);
+        emailLabel.setForeground(Color.WHITE);
+        emailLabel.setFont(labelFont);
+        panel.add(emailLabel);
+
+        JTextField emailText = new JTextField(20);
+        emailText.setBounds(120, 200, 165, 25);
+        emailText.setFont(textFont);
+        emailText.setBackground(new Color(240, 240, 240));
+        panel.add(emailText);
+
+        // Buttons (styled)
+        JButton submitButton = new JButton("Submit");
+        submitButton.setBounds(120, 230, 100, 40);
+        submitButton.setBackground(Color.BLUE); // Light Red
+        submitButton.setForeground(Color.BLACK);
+        panel.add(submitButton);
+
+        JButton searchButton = new JButton("Search");
+        searchButton.setBounds(230, 230, 100, 40);
+        searchButton.setBackground(Color.YELLOW); // Light Red
+        searchButton.setForeground(Color.BLACK);
+        panel.add(searchButton);
+
+        // Action for Submit button
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int regNumber = Integer.parseInt(regText.getText());
+                String lastName = lastNameText.getText();
+                String firstName = firstNameText.getText();
+                int yearsOfStudy = Integer.parseInt(yearsText.getText());
+                String telephone = phoneText.getText();
+                String college = collegeText.getText();
+                String email = emailText.getText();
+                
+ new StudentInfo().insertStudent(regNumber, lastName, firstName, yearsOfStudy, telephone, college, email);
+            }
+        });
+
+       
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Search failed !");
+            }
+        });
+    }
+}
